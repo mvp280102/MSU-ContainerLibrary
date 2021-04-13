@@ -1,8 +1,1 @@
-//
-// Created by mvp280102 on 13.04.2021.
-//
-
-#ifndef MSU_CONTAINERLIBRARY_TREE_H
-#define MSU_CONTAINERLIBRARY_TREE_H
-
-#endif //MSU_CONTAINERLIBRARY_TREE_H
+#pragma once

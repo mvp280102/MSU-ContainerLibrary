@@ -1,11 +1,21 @@
 #pragma once
+
 #include <stdlib.h>
 
-// Базовый класс менеджера памяти
-class MemoryManager {
+// TODO: Make comments.
+
+// Базовый класс менеджера памяти.
+class MemoryManager
+{
 	private:
+
+	// Размер общей памяти.
 	size_t _size;
+
+
 	public:
+
+	// Конструктор.
 	MemoryManager(size_t sz): _size(sz) {}
 
 	size_t size()
