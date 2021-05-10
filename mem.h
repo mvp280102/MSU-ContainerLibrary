@@ -19,6 +19,6 @@ class Mem: public MemoryManager
 	// Освобождает участок памяти, на который указывает заданный указатель.
 	void freeMem(void* ptr)
 	{
-		delete[] ptr;
+		delete[]static_cast<char*>(ptr);
 	}
 };
