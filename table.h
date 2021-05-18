@@ -1,36 +1,30 @@
 #ifndef MSU_CONTAINERLIBRARY_TABLE_H
 #define MSU_CONTAINERLIBRARY_TABLE_H
 #include "TableAbstract.h"
-#include "myToyList.h"
+#include "myToyListForTable.h"
 #include "container.h"
 
-struct ArrayCell{
-    void* key;
-    size_t key_size;
-    void* elem;
-    size_t elem_size;
-};
 
 class Table : public AbstractTable {
 private:
-    static const size_t container_size = 1'000'000;
-    List *map[1'000'000];
+    static const size_t container_size = 500'000;
+    ListForTable *map[container_size] = {nullptr};
     size_t elements_count = 0;
 
 public:
 
-    Table(MemoryManager &mem): AbstractTable(mem) {}
+    Table(MemoryManager &mem): AbstractTable(mem)  {}
 
     class TableIterator : public Container::Iterator  {
     public:
-        Table *table;
-        List::Iterator *current_cell;
+        ListForTable::Iterator *current_cell;
         int index;
+        Table *table;
 
-        TableIterator(Table *table, List::Iterator *current_cell, int index):
-                table(table),
+        TableIterator(ListForTable::Iterator *current_cell, int index, Table *table):
                 current_cell(current_cell),
-                index(index) {}
+                index(index),
+                table(table){}
 
         void *getElement(size_t &size) override;
 

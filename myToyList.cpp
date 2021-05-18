@@ -14,12 +14,14 @@ bool List::Iterator::hasNext() {
 }
 
 void List::Iterator::goToNext() {
-    if(hasNext()){
-        current = current->next;
+    if (current == nullptr) {
+        return;
     }
-    else
-        throw Error("There is no next one");
+    current = current->next;
 }
+//    else
+//        throw Error("There is no next one");
+
 
 bool List::Iterator::equals(Container::Iterator *right) {
     if (current == dynamic_cast<Iterator*>(right)->current)
@@ -113,7 +115,7 @@ List::Iterator* List::find(void *elem, size_t size) {
             temp->goToNext();
             continue;
         }
-        if (memcmp(elem, temp->current->value, size) == 0)
+        if (elem == temp->current->value)
             break;
         else temp->goToNext();
     }
@@ -167,7 +169,7 @@ void List::clear() {
 }
 
 bool List::empty() {
-    if (cells_count == 0)
+    if (beginning == nullptr)
         return true;
     return false;
 }

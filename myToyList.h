@@ -25,7 +25,6 @@ public:
     private:
         Cell* current;
     public:
-
         void* getElement(size_t &size) override;
 
         bool hasNext() override;
@@ -37,6 +36,7 @@ public:
         ~Iterator() = default;
 
         friend List;
+        friend class ListForTable;
     };
 
     void print(){
@@ -81,6 +81,8 @@ public:
     void clear() override;
 
     bool empty() override;
+
+    friend class ListForTable;
 };
 
 #endif //MSU_CONTAINERLIBRARY_MYTOYLIST_H
