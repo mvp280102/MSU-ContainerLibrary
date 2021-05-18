@@ -11,7 +11,7 @@ class AbstractList: public GroupList
 	AbstractList(MemoryManager &mem): GroupList(mem) {}
 
 	// Деструктор.
-	virtual ~AbstractList() {}
+	virtual ~AbstractList() = default;
 
 	// Добавляет элемент в начало списка.
 	// В случае успешного добавления возвращает значение 0, иначе 1.
