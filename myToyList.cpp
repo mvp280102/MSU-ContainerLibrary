@@ -119,7 +119,9 @@ List::Iterator* List::find(void *elem, size_t size) {
             break;
         else temp->goToNext();
     }
-    return nullptr;
+    if(temp->current == nullptr)
+        return nullptr;
+    return temp;
 }
 
 List::Iterator* List::newIterator() {
@@ -172,5 +174,3 @@ bool List::empty() {
     if (beginning == nullptr)
         return true;
     return false;
-}
-
