@@ -1,6 +1,6 @@
 #pragma once
 
-#include "group-container.h.h"
+#include "GroupContainer.h"
 
 // Абстрактный класс - Ассоциативная таблица.
 class AbstractTable: public GroupContainer
@@ -26,7 +26,4 @@ class AbstractTable: public GroupContainer
 
 	// Возвращает указатель на элемент с ключом key.
 	virtual void* at(void *key, size_t keySize, size_t &valueSize) = 0;
-
-	// Хэш-функция.
-	virtual size_t hash_function(void *key, size_t keySize) = 0;
 };

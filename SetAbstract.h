@@ -1,6 +1,6 @@
 #pragma once
 
-#include "group-container.h.h"
+#include "GroupContainer.h"
 
 // Абстрактный класс - Множество.
 class AbstractSet: public GroupContainer
