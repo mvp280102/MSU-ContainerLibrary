@@ -185,6 +185,18 @@ List::Iterator* List::newIterator()
 	return iterator;
 }
 
+// Возвращает указатель на итератор, указывающий на первый элемент контейнера.
+// Если контейнер пустой, возвращает нулевой указатель.
+List::Iterator* List::begin()
+{
+	if (empty())
+		return nullptr;
+
+	Iterator* iterator = newIterator();
+
+	return iterator;
+}
+
 // Удаляет элемент из позиции, на которую указывает итератор iter.
 // После удаления итератор указывает на следующий за удаленным элемент.
 void List::remove(Container::Iterator *iter)
