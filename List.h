@@ -55,8 +55,11 @@ class List : public AbstractList
 		// Деструктор.
 		~Iterator() = default;
 
-		// Класс List дружественный к классу Iterator.
+		// Дружественный класс List.
 		friend List;
+
+		// Дружественный класс TableList.
+		friend class TableList;
 	};
 
 	// Выводит на экран все элементы списка.
@@ -124,4 +127,7 @@ class List : public AbstractList
 
 	// Если список пуст, возвращает true, иначе false.
 	bool empty() override;
+
+	// Дружественный класс TableList.
+	friend class TableList;
 };
