@@ -1,6 +1,6 @@
 #pragma once
 
-#include "group-container.h"
+#include "GroupContainer.h"
 
 // Абстрактный класс - Дерево.
 class AbstractTree: public GroupContainer
