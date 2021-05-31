@@ -44,6 +44,7 @@ int List::push_front(void *elem, size_t elemSize) {
     beginning = front;
     cells_count++;
     return 0;
+
 }
 
 void List::pop_front() {
@@ -174,3 +175,4 @@ bool List::empty() {
     if (beginning == nullptr)
         return true;
     return false;
+}

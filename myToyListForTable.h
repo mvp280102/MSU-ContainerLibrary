@@ -3,9 +3,9 @@
 #include "myToyList.h"
 
 struct ArrayCell{
-    void* key;
+    void* key = nullptr;
     size_t key_size;
-    void* elem;
+    void* elem = nullptr;
     size_t elem_size;
 };
 
@@ -14,34 +14,19 @@ public:
     explicit ListForTable(MemoryManager &mem): List(mem) {}
 
     Iterator * find(void *elem, size_t size) override {
-        if(empty())
+        Iterator* iter = newIterator();
+        size_t trash;
+        do {
+            ArrayCell temp = *(ArrayCell*)(iter->getElement(trash));
+            //cout << "Test:" << *(int*)elem << " "<< *(int*)temp.key << endl;
+            if(temp.key_size == size)
+                if(memcmp(temp.key, elem, size) == 0)
+                    break;
+                iter->goToNext();
+        } while (iter->current != nullptr);
+        if(iter->current == nullptr)
             return nullptr;
-        Iterator* temp = begin();
-        while (temp->current != nullptr){
-            if (size != temp->current->value_size) {
-                temp->goToNext();
-                continue;
-            }
-            if (compare(elem, temp->current->value))
-                break;
-            else temp->goToNext();
-        }
-        if(temp->current == nullptr)
-            return nullptr;
-        return temp;
-    }
-
-    bool compare(void* left, void* right){
-
-        ArrayCell* real_left = static_cast<ArrayCell*>(left);
-        ArrayCell* real_right = static_cast<ArrayCell*>(right);
-
-        if (real_left->key_size == real_right->key_size) {
-            if(memcmp(real_left->key, real_right->key, real_left->key_size) == 0)
-                return true;
-        }
-        return false;
-
+        return iter;
     }
 };
 

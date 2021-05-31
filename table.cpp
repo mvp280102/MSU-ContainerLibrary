@@ -3,7 +3,8 @@
 ///////////////* ФУНКЦИИ КЛАССА ITERATOR *\\\\\\\\\\\\\\\
 
 void* Table::TableIterator::getElement(size_t &size) {
-    return (current_cell->getElement(size));
+    ArrayCell* temp = static_cast<ArrayCell*>(current_cell->getElement(size));
+    return temp->elem;
 }
 
 bool Table::TableIterator::hasNext() {
@@ -11,7 +12,7 @@ bool Table::TableIterator::hasNext() {
         return true;
     else{
         for (int i = index + 1; i < container_size; ++i) {
-            if(table->map[i]->empty())
+            if(!table->map[i]->empty())
                 return true;
         }
     }
@@ -24,7 +25,7 @@ void Table::TableIterator::goToNext() {
         current_cell->goToNext();
     else {
         for (int i = index + 1; i < container_size; ++i) {
-            if (table->map[i]->empty()) {
+            if (table->map[i] != nullptr) {
                 current_cell = table->map[i]->begin();
                 flag = true;
                 break;
@@ -46,7 +47,13 @@ bool Table::TableIterator::equals(Iterator *right) {
 
 int Table::insertByKey(void *key, size_t keySize, void *elem, size_t elemSize){
     size_t index = hash_function(key, keySize);
-    ArrayCell temp = {key, keySize, elem, elemSize};
+
+    char *keyToSave = static_cast<char*>(_memory.allocMem(sizeof(keySize)));
+    char *elemToSave = static_cast<char*>(_memory.allocMem(sizeof(elemSize)));
+    memcpy(keyToSave, key, keySize);
+    memcpy(elemToSave, elem, elemSize);
+
+    ArrayCell temp = {keyToSave, keySize, elemToSave, elemSize};
     void* data = static_cast<void*>(&temp);
     size_t data_size = sizeof(temp);
     if(map[index] == nullptr) {
@@ -56,9 +63,10 @@ int Table::insertByKey(void *key, size_t keySize, void *elem, size_t elemSize){
     if(map[index]->empty()) {
         map[index]->push_front(data, data_size);
         elements_count++;
+
         return 0;
     } else {
-        if (map[index]->find(data, data_size) == nullptr) {
+        if (map[index]->find(key, keySize) == nullptr) {
             map[index]->push_front(data, data_size);
             elements_count++;
             return 0;
@@ -69,22 +77,27 @@ int Table::insertByKey(void *key, size_t keySize, void *elem, size_t elemSize){
 
 void Table::removeByKey(void *key, size_t keySize) {
     size_t index = hash_function(key, keySize);
-    ArrayCell temp = {key, keySize, nullptr, 0};
-    void* data = static_cast<void*>(&temp);
-    size_t data_size = sizeof data;
-    List::Iterator *tmp = map[index]->find(data, data_size);
-    if(tmp != nullptr) {
+
+    List::Iterator *tmp = map[index]->find(key, keySize);
+    if (tmp != nullptr) {
         map[index]->remove(tmp);
         elements_count--;
+    }
+
+    if (map[index]->empty()){
+        _memory.freeMem(map[index]);
+        map[index] = nullptr;
     }
 }
 
 Container::Iterator* Table::findByKey(void *key, size_t keySize){
     size_t index = hash_function(key, keySize);
-    ArrayCell temp = {key, keySize, nullptr, 0};
-    void* data = static_cast<void*>(&temp);
-    size_t data_size = sizeof(temp);
-    return map[index]->find(data, data_size);
+    if(map[index] == nullptr || map[index]->empty())
+        return nullptr;
+    ListForTable::Iterator* temp = dynamic_cast<ListForTable::Iterator*>(map[index]->find(key, keySize));
+    if (temp == nullptr)
+        return nullptr;
+    return new TableIterator(temp, (int)index, this);
 }
 
 ///// головная боль № 1\\\\\
@@ -121,14 +134,18 @@ Container::Iterator* Table::find(void *elem, size_t size) {
     TableIterator* finder = dynamic_cast<TableIterator *>(newIterator());
     size_t trash;
     for (int i = 0; i < container_size; ++i) {
-        if(!map[i]->empty()) {
+        if(map[i] != nullptr) {
+            cout << "inside " << i << endl;
             finder->current_cell = map[i]->begin();
+            finder->index = i;
             do {
                 ArrayCell *findedCell = static_cast<ArrayCell *>(finder->current_cell->getElement(trash));
-                if (findedCell->elem == elem && findedCell->elem_size == size)
+//                cout << *(int*)findedCell->elem << endl;
+//                cout << *(int*)elem << endl;
+                if (memcmp(findedCell->elem, elem, size) == 0 && findedCell->elem_size == size)
                     return new TableIterator(finder->current_cell, i, this);
                 finder->goToNext();
-            } while (finder->current_cell->hasNext());
+            } while (finder->current_cell != nullptr);
         }
     }
     return nullptr;
@@ -174,7 +191,7 @@ void Table::remove(Iterator *iter) {
             }
             iterator->current_cell->goToNext();
         }
-        while(iterator->current_cell->hasNext());
+        while(iterator->current_cell != nullptr);
         if(okFlag)
             break;
     }
