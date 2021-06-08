@@ -26,13 +26,15 @@ void Table::TableIterator::goToNext() {
     else {
         for (int i = index + 1; i < container_size; ++i) {
             if (table->map[i] != nullptr) {
-                current_cell = table->map[i]->begin();
+                current_cell = table->map[i]->newIterator();
+                index = i;
                 flag = true;
                 break;
             }
         }
         if (!flag) {
-            throw Error("There is no next one");
+//            throw Error("There is no next one");
+            current_cell = nullptr;
         }
     }
 }
@@ -78,7 +80,7 @@ int Table::insertByKey(void *key, size_t keySize, void *elem, size_t elemSize){
 void Table::removeByKey(void *key, size_t keySize) {
     size_t index = hash_function(key, keySize);
 
-    List::Iterator *tmp = map[index]->find(key, keySize);
+    ListForTable::Iterator *tmp = map[index]->find(key, keySize);
     if (tmp != nullptr) {
         map[index]->remove(tmp);
         elements_count--;
@@ -132,68 +134,35 @@ size_t Table::max_bytes() {
 
 Container::Iterator* Table::find(void *elem, size_t size) {
     TableIterator* finder = dynamic_cast<TableIterator *>(newIterator());
-    size_t trash;
-    for (int i = 0; i < container_size; ++i) {
-        if(map[i] != nullptr) {
-            cout << "inside " << i << endl;
-            finder->current_cell = map[i]->begin();
-            finder->index = i;
-            do {
-                ArrayCell *findedCell = static_cast<ArrayCell *>(finder->current_cell->getElement(trash));
-//                cout << *(int*)findedCell->elem << endl;
-//                cout << *(int*)elem << endl;
-                if (memcmp(findedCell->elem, elem, size) == 0 && findedCell->elem_size == size)
-                    return new TableIterator(finder->current_cell, i, this);
-                finder->goToNext();
-            } while (finder->current_cell != nullptr);
-        }
+    while (finder!= nullptr && finder->current_cell != nullptr) {
+        size_t trash;
+        ArrayCell *findedCell = static_cast<ArrayCell *>(finder->current_cell->getElement(trash));
+        if (findedCell->elem_size == size && memcmp(findedCell->elem, elem, size) == 0)
+            return new TableIterator(finder->current_cell, finder->index, this);
+        finder->goToNext();
     }
+
     return nullptr;
 }
 
 Table::Iterator* Table::newIterator() {
-    TableIterator* iterator = new TableIterator(nullptr, 0, this);
-    return iterator;
-}
-
-Table::Iterator* Table::begin(){
-    TableIterator* iterator = dynamic_cast<TableIterator *>(newIterator());
-    if(iterator == nullptr)
-        return nullptr;
     for (int i = 0; i < container_size; ++i) {
-        if(!map[i]->empty())
-            return new TableIterator(dynamic_cast<ListForTable::Iterator*>(map[i]->begin()), i, this);
+        if(map[i] != nullptr)
+            return new TableIterator(dynamic_cast<ListForTable::Iterator*>(map[i]->newIterator()), i, this);
     }
     return nullptr;
 }
 
-Table::Iterator* Table::end(){
-    TableIterator* iterator = dynamic_cast<TableIterator *>(newIterator());
-    if(iterator == nullptr)
-        return nullptr;
-    for (int i = container_size - 1; i >= 0; ++i) {
-        if(!map[i]->empty())
-            return new TableIterator(dynamic_cast<ListForTable::Iterator*>(map[i]->end()), i, this);
+void Table::remove(Iterator *iter){
+    TableIterator* Iter = dynamic_cast<TableIterator *>(iter);
+    if(Iter != nullptr && Iter->current_cell != nullptr) {
+        map[Iter->index]->remove(Iter->current_cell);
+        elements_count--;
     }
-    return nullptr;
-}
 
-void Table::remove(Iterator *iter) {
-    bool okFlag = false;
-    TableIterator* iterator = dynamic_cast<TableIterator *>(begin());
-    ListForTable::Iterator* Iter = dynamic_cast<ListForTable::Iterator *>(iter);
-    for (int i = 0; i < container_size; ++i) {
-        do {
-            if (iterator->current_cell == Iter) {
-                map[i]->remove(Iter);
-                okFlag = true;
-                break;
-            }
-            iterator->current_cell->goToNext();
-        }
-        while(iterator->current_cell != nullptr);
-        if(okFlag)
-            break;
+    if (map[Iter->index]->empty()){
+        _memory.freeMem(map[Iter->index]);
+        map[Iter->index] = nullptr;
     }
 }
 

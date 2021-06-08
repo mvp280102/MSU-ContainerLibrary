@@ -72,10 +72,6 @@ public:
 
     Iterator* newIterator() override;
 
-    Iterator* begin() override;
-
-    Iterator* end() override;
-
     void remove(Container::Iterator *iter) override;
 
     void clear() override;

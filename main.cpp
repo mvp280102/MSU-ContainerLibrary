@@ -65,6 +65,7 @@ int main() {
         Container::Iterator* temp = table.find(&i, sizeof(int));
         if (temp != nullptr) {
             table.remove(temp);
+            cout << table.size() << endl;
         }
         cout << i << " done" << endl;
         delete temp;

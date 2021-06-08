@@ -128,18 +128,9 @@ List::Iterator* List::find(void *elem, size_t size) {
 List::Iterator* List::newIterator() {
     Iterator* iterator = new Iterator();
     iterator->current = beginning;
-    return iterator;
-}
-
-List::Iterator* List::begin() {
     if(empty())
         return nullptr;
-    Iterator* iterator = newIterator();
     return iterator;
-}
-
-List::Iterator* List::end() {
-    return nullptr;
 }
 
 void List::remove(Container::Iterator *iter) {
