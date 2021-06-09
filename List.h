@@ -26,10 +26,10 @@ class List : public AbstractList
 	public:
 
 	// Конструктор.
-	List(MemoryManager &mem) : AbstractList(mem), cells_count(0) {}
+	explicit List(MemoryManager &mem) : AbstractList(mem), cells_count(0) {}
 
 	// Класс итератора списка.
-	class Iterator : public AbstractList::Iterator
+	class ListIterator : public AbstractList::Iterator
 	{
 		private:
 
@@ -53,7 +53,7 @@ class List : public AbstractList
 		bool equals(Container::Iterator *right) override;
 
 		// Деструктор.
-		~Iterator() = default;
+		~ListIterator() = default;
 
 		// Дружественный класс List.
 		friend List;
@@ -65,7 +65,7 @@ class List : public AbstractList
 	// Выводит на экран все элементы списка.
 	void print()
 	{
-		Iterator* it = newIterator();
+		ListIterator* it = dynamic_cast<ListIterator *>(newIterator());
 
 		for (int i = 0; i < size(); ++i)
 		{
@@ -109,14 +109,10 @@ class List : public AbstractList
 
 	// Возвращает указатель на итератор, указывающий на первый найденный в списке элемент.
 	// Если элемент не найден, возвращает пустой указатель.
-	Container::Iterator * find(void *elem, size_t size) override;
+	Iterator* find(void *elem, size_t size) override;
 
 	// Создает итератор, соответствующий списку.
 	Iterator* newIterator() override;
-
-	// Возвращает указатель на итератор, указывающий на первый элемент контейнера.
-	// Если контейнер пустой, возвращает нулевой указатель.
-	Iterator* begin() override;
 
 	// Удаляет элемент из позиции, на которую указывает итератор iter.
 	// После удаления итератор указывает на следующий за удаленным элемент.

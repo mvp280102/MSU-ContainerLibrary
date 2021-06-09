@@ -4,7 +4,7 @@
 
 // Возврашает явно указатель на элемент, на который указывает текущий итератор в данный момент.
 // Неявно возвращает размер данных.
-void* List::Iterator::getElement(size_t &size)
+void* List::ListIterator::getElement(size_t &size)
 {
 	size = current->value_size;
 
@@ -12,24 +12,24 @@ void* List::Iterator::getElement(size_t &size)
 }
 
 // Возвращает true, если есть следующий элемент, иначе false.
-bool List::Iterator::hasNext()
+bool List::ListIterator::hasNext()
 {
 	return current->next != nullptr;
 }
 
 // Переходит к следующему элементу.
-void List::Iterator::goToNext()
+void List::ListIterator::goToNext()
 {
-	if(hasNext())
+	if (hasNext())
 		current = current->next;
 	else
-		throw Error("There is no next one.");
+		current = nullptr;
 }
 
 // Возвращает true, если текущий итератор равен заданному, иначе false.
-bool List::Iterator::equals(Container::Iterator *right)
+bool List::ListIterator::equals(Container::Iterator *right)
 {
-	return current == dynamic_cast<Iterator*>(right)->current;
+	return current == dynamic_cast<ListIterator*>(right)->current;
 }
 
 
@@ -93,17 +93,17 @@ void* List::front(size_t &size)
 // В случае успешного добавления возвращает значение 0, иначе 1.
 int List::insert(AbstractList::Iterator *iter, void *elem, size_t elemSize)
 {
-	Iterator* iterator = dynamic_cast<Iterator*>(iter);
+	ListIterator* iterator = dynamic_cast<ListIterator*>(iter);
 	Cell* new_cell = static_cast<Cell*>(_memory.allocMem(sizeof(Cell)));
 
-	if(iterator->current == beginning)
+	if (iterator->current == beginning)
 	{
 		new_cell->next = beginning;
 		beginning = new_cell;
 	}
 	else
 	{
-		Iterator* trash = newIterator();
+		ListIterator* trash = dynamic_cast<ListIterator *>(newIterator());
 		trash->current = beginning->next;
 		Cell* previous = beginning;
 
@@ -134,6 +134,7 @@ int List::insert(AbstractList::Iterator *iter, void *elem, size_t elemSize)
 	return 0;
 }
 
+
 //// ФУНКЦИИ КОНТЕЙНЕРА:
 
 // Возвращает значение, равное количеству элементов в списке.
@@ -150,12 +151,12 @@ size_t List::max_bytes()
 
 // Возвращает указатель на итератор, указывающий на первый найденный в списке элемент.
 // Если элемент не найден, возвращает пустой указатель.
-Container::Iterator* List::find(void *elem, size_t size)
+List::Iterator* List::find(void *elem, size_t size)
 {
-	if(empty())
+	if (empty())
 		return nullptr;
 
-	Iterator* temp = newIterator();
+	ListIterator* temp = dynamic_cast<ListIterator *>(newIterator());
 	temp->current = beginning;
 
 	while (temp->current != nullptr)
@@ -166,33 +167,27 @@ Container::Iterator* List::find(void *elem, size_t size)
 			continue;
 		}
 
-		if (memcmp(elem, temp->current->value, size) == 0)
+		if (elem == temp->current->value)
 			break;
 		else
 			temp->goToNext();
 	}
 
-	return nullptr;
+	if (temp->current == nullptr)
+		return nullptr;
+
+	return temp;
 }
 
 // Создает итератор, соответствующий списку.
 List::Iterator* List::newIterator()
 {
-	Iterator* iterator = new Iterator();
+	ListIterator *iterator = new ListIterator();
 
 	iterator->current = beginning;
 
-	return iterator;
-}
-
-// Возвращает указатель на итератор, указывающий на первый элемент контейнера.
-// Если контейнер пустой, возвращает нулевой указатель.
-List::Iterator* List::begin()
-{
-	if (empty())
+	if(empty())
 		return nullptr;
-
-	Iterator* iterator = newIterator();
 
 	return iterator;
 }
@@ -201,13 +196,13 @@ List::Iterator* List::begin()
 // После удаления итератор указывает на следующий за удаленным элемент.
 void List::remove(Container::Iterator *iter)
 {
-	Iterator* iterator = dynamic_cast<Iterator *>(iter);
+	ListIterator* iterator = dynamic_cast<ListIterator*>(iter);
 
 	if (iterator->current == beginning)
 		pop_front();
 	else
 	{
-		Iterator *trash = newIterator();
+		ListIterator *trash = dynamic_cast<ListIterator *>(newIterator());
 		trash->current = beginning->next;
 		Cell *previous = beginning;
 
@@ -245,5 +240,5 @@ void List::clear()
 // Если список пуст, возвращает true, иначе false.
 bool List::empty()
 {
-	return cells_count == 0;
+	return beginning == nullptr;
 }
