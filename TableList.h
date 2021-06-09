@@ -6,10 +6,10 @@
 
 struct ArrayCell
 {
-	void* key;
+	void* key = nullptr;
 	size_t key_size;
 
-	void* elem;
+	void* elem = nullptr;
 	size_t elem_size;
 };
 
@@ -20,7 +20,4 @@ class TableList : public List
 	explicit TableList(MemoryManager &mem): List(mem) {}
 
 	Iterator* find(void *elem, size_t size) override;
-
-
-	bool compare(void* left, void* right);
 };
