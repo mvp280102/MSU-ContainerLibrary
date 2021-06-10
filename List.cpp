@@ -20,10 +20,17 @@ bool List::ListIterator::hasNext()
 // Переходит к следующему элементу.
 void List::ListIterator::goToNext()
 {
+	/*
 	if (hasNext())
 		current = current->next;
 	else
 		current = nullptr;
+	*/
+
+	if (current == nullptr)
+		return;
+
+	current = current->next;
 }
 
 // Возвращает true, если текущий итератор равен заданному, иначе false.
@@ -34,6 +41,26 @@ bool List::ListIterator::equals(Container::Iterator *right)
 
 
 //// ФУНКЦИИ СПИСКА:
+
+// Выводит на экран все элементы списка.
+void List::print()
+{
+	auto* it = dynamic_cast<ListIterator*>(newIterator());
+
+	for (int i = 0; i < size(); ++i)
+	{
+		cout << "Element " << i << ":" << endl;
+
+		char* string = static_cast<char*>(it->current->value);
+
+		for (int j = 0; j < it->current->value_size; ++j)
+			cout << string[j];
+
+		cout << endl;
+
+		it->goToNext();
+	}
+}
 
 // Добавляет элемент в начало списка.
 // В случае успешного добавления возвращает значение 0, иначе 1.
@@ -93,7 +120,7 @@ void* List::front(size_t &size)
 // В случае успешного добавления возвращает значение 0, иначе 1.
 int List::insert(AbstractList::Iterator *iter, void *elem, size_t elemSize)
 {
-	ListIterator* iterator = dynamic_cast<ListIterator*>(iter);
+	auto *iterator = dynamic_cast<ListIterator*>(iter);
 	Cell* new_cell = static_cast<Cell*>(_memory.allocMem(sizeof(Cell)));
 
 	if (iterator->current == beginning)
@@ -103,7 +130,7 @@ int List::insert(AbstractList::Iterator *iter, void *elem, size_t elemSize)
 	}
 	else
 	{
-		ListIterator* trash = dynamic_cast<ListIterator *>(newIterator());
+		auto *trash = dynamic_cast<ListIterator*>(newIterator());
 		trash->current = beginning->next;
 		Cell* previous = beginning;
 
@@ -156,7 +183,7 @@ List::Iterator* List::find(void *elem, size_t size)
 	if (empty())
 		return nullptr;
 
-	ListIterator* temp = dynamic_cast<ListIterator *>(newIterator());
+	auto* temp = dynamic_cast<ListIterator*>(newIterator());
 	temp->current = beginning;
 
 	while (temp->current != nullptr)
@@ -182,7 +209,7 @@ List::Iterator* List::find(void *elem, size_t size)
 // Создает итератор, соответствующий списку.
 List::Iterator* List::newIterator()
 {
-	ListIterator *iterator = new ListIterator();
+	auto *iterator = new ListIterator();
 
 	iterator->current = beginning;
 
@@ -196,13 +223,13 @@ List::Iterator* List::newIterator()
 // После удаления итератор указывает на следующий за удаленным элемент.
 void List::remove(Container::Iterator *iter)
 {
-	ListIterator* iterator = dynamic_cast<ListIterator*>(iter);
+	auto* iterator = dynamic_cast<ListIterator*>(iter);
 
 	if (iterator->current == beginning)
 		pop_front();
 	else
 	{
-		ListIterator *trash = dynamic_cast<ListIterator *>(newIterator());
+		auto *trash = dynamic_cast<ListIterator *>(newIterator());
 		trash->current = beginning->next;
 		Cell *previous = beginning;
 

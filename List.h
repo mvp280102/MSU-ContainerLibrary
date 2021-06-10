@@ -62,27 +62,10 @@ class List : public AbstractList
 		friend class TableList;
 	};
 
-	// Выводит на экран все элементы списка.
-	void print()
-	{
-		ListIterator* it = dynamic_cast<ListIterator *>(newIterator());
-
-		for (int i = 0; i < size(); ++i)
-		{
-			cout << "Element " << i << ":" << endl;
-
-			char* string = static_cast<char*>(it->current->value);
-
-			for (int j = 0; j < it->current->value_size; ++j)
-				cout << string[j];
-
-			cout << endl;
-
-			it->goToNext();
-		}
-	}
-
 	//// ФУНКЦИИ СПИСКА:
+
+	// Выводит на экран все элементы списка.
+	void print();
 
 	// Добавляет элемент в начало списка.
 	// В случае успешного добавления возвращает значение 0, иначе 1.
