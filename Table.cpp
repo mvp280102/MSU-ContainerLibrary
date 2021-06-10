@@ -115,14 +115,6 @@ void* Table::at(void *key, size_t keySize, size_t &valueSize){
 
 ///////////////* ФУНКЦИИ КЛАССА TABLE *\\\\\\\\\\\\\\\
 
-int Table::size() {
-	return elements_count;
-}
-
-size_t Table::max_bytes() {
-	return _memory.maxBytes();
-}
-
 Container::Iterator* Table::find(void *elem, size_t size) {
 	TableIterator* finder = dynamic_cast<TableIterator *>(newIterator());
 	while (finder!= nullptr && finder->current_cell != nullptr) {
@@ -164,10 +156,3 @@ void Table::clear() {
 	}
 	elements_count = 0;
 }
-
-bool Table::empty() {
-	if(size() == 0)
-		return true;
-	return false;
-}
-

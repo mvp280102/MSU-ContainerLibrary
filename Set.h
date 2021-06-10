@@ -8,12 +8,11 @@ class Set : public AbstractSet
 	private:
 
 	List *map[CONTAINER_SIZE] = { nullptr };
-	int elements_count = 0;
 
 	public:
 
 	// Конструктор.
-	Set(MemoryManager &mem): AbstractSet(mem) {}
+	explicit Set(MemoryManager &mem): AbstractSet(mem) {}
 
 	// Класс итератора множества.
 	class SetIterator : public Container::Iterator
@@ -58,12 +57,6 @@ class Set : public AbstractSet
 
 	//// ФУНКЦИИ КОНТЕЙНЕРА:
 
-	// Возвращает значение, равное количеству элементов в контейнере.
-	int size() override;
-
-	// Возвращает значение, равное максимальной вместимости контейнера в байтах.
-	size_t max_bytes() override;
-
 	// Возвращает указатель на итератор, указывающий на первый найденный в контейнере элемент.
 	// Если элемент не найден, возвращает пустой указатель.
 	Iterator* find(void *elem, size_t size) override;
@@ -77,7 +70,4 @@ class Set : public AbstractSet
 
 	// Удаляет все элементы из контейнера.
 	void clear() override;
-
-	// Если контейнер пуст, возвращает true, иначе false.
-	bool empty() override;
 };

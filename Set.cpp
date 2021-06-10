@@ -65,6 +65,8 @@ int Set::insert(void *elem, size_t size)
 
 	if (!map[index]->push_front(elem, size))
 	{
+		//cout << "Added successfully!" << endl;
+
 		elements_count++;
 		return 0;
 	}
@@ -74,18 +76,6 @@ int Set::insert(void *elem, size_t size)
 
 
 //// ФУНКЦИИ КОНТЕЙНЕРА:
-
-// Возвращает значение, равное количеству элементов в контейнере.
-int Set::size()
-{
-	return elements_count;
-}
-
-// Возвращает значение, равное максимальной вместимости контейнера в байтах.
-size_t Set::max_bytes()
-{
-	return _memory.maxBytes();
-}
 
 // Возвращает указатель на итератор, указывающий на первый найденный в контейнере элемент.
 // Если элемент не найден, возвращает пустой указатель.
@@ -133,10 +123,4 @@ void Set::clear()
 	}
 
 	elements_count = 0;
-}
-
-// Если контейнер пуст, возвращает true, иначе false.
-bool Set::empty()
-{
-	return !elements_count;
 }

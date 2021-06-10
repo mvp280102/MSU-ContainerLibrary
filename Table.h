@@ -56,12 +56,6 @@ class Table : public AbstractTable {
 	// доступ к элементу с ключом key
 	void *at(void *key, size_t keySize, size_t &valueSize) override;
 
-	// Возвращает значение, равное количеству элементов в контейнере.
-	int size() override;
-
-	// Возвращает значение, равное максимальной вместимости контейнера в байтах.
-	size_t max_bytes() override;
-
 	// Возвращает указатель на итератор, указывающий на первый найденный в контейнере элемент.
 	// Если элемент не найден, возвращает пустой указатель.
 	Iterator *find(void *elem, size_t size) override;
@@ -75,8 +69,4 @@ class Table : public AbstractTable {
 
 	// Удаляет все элементы из контейнера.
 	void clear() override;
-
-	// Если контейнер пуст возвращает true, иначе false.
-	bool empty() override;
-
 };
