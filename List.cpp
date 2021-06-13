@@ -223,13 +223,13 @@ List::Iterator* List::newIterator()
 // После удаления итератор указывает на следующий за удаленным элемент.
 void List::remove(Container::Iterator *iter)
 {
-	auto* iterator = dynamic_cast<ListIterator*>(iter);
+	auto *iterator = dynamic_cast<ListIterator*>(iter);
 
 	if (iterator->current == beginning)
 		pop_front();
 	else
 	{
-		auto *trash = dynamic_cast<ListIterator *>(newIterator());
+		auto *trash = dynamic_cast<ListIterator*>(newIterator());
 		trash->current = beginning->next;
 		Cell *previous = beginning;
 
@@ -246,6 +246,8 @@ void List::remove(Container::Iterator *iter)
 
 		cells_count--;
 	}
+
+	iterator->goToNext();
 }
 
 // Удаляет все элементы из списка.
