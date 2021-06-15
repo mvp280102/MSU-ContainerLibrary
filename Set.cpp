@@ -40,7 +40,7 @@ void Set::SetIterator::goToNext()
 			}
 
 		if (!success)
-			cout << "Next element doesn't exist." << endl;
+			throw Error("Next element doesn't exist.");
 	}
 }
 
@@ -58,7 +58,7 @@ bool Set::SetIterator::equals(Iterator *right)
 // во всех остальных случаях - 2.
 int Set::insert(void *elem, size_t size)
 {
-	size_t index = hash_function(elem, size);
+	size_t index = common_hash_function(elem, size);
 
 	if (map[index] == nullptr)
 		map[index] = new List(_memory);
@@ -67,8 +67,6 @@ int Set::insert(void *elem, size_t size)
 
 	if (!map[index]->push_front(elem, size))
 	{
-		//cout << "Added successfully!" << endl;
-
 		elements_count++;
 		return 0;
 	}
@@ -83,18 +81,18 @@ int Set::insert(void *elem, size_t size)
 // Если элемент не найден, возвращает пустой указатель.
 Set::Iterator* Set::find(void *elem, size_t size)
 {
-	SetIterator *set_iter = nullptr;
-	size_t index = hash_function(elem, size);
+	SetIterator *set_iterator = nullptr;
+	size_t index = common_hash_function(elem, size);
 
 	if (map[index] == nullptr)
 		return nullptr;
 
-	auto *list_iter = dynamic_cast<List::ListIterator *>(map[index]->find(elem, size));
+	auto *list_iter = dynamic_cast<List::ListIterator*>(map[index]->find(elem, size));
 
 	if (list_iter != nullptr)
-		set_iter = new SetIterator(this, list_iter, index);
+		set_iterator = new SetIterator(this, list_iter, index);
 
-	return set_iter;
+	return set_iterator;
 }
 
 // Создает итератор, соответствующий данному типу контейнера.
@@ -111,14 +109,14 @@ Set::Iterator* Set::newIterator()
 // После удаления итератор указывает на следующий за удаленным элемент.
 void Set::remove(Iterator *iter)
 {
-	auto *req_iterator = dynamic_cast<SetIterator*>(iter);
+	auto *set_iterator = dynamic_cast<SetIterator*>(iter);
 
-	map[req_iterator->index]->remove(req_iterator->cur);
+	map[set_iterator->index]->remove(set_iterator->cur);
 
-	if (map[req_iterator->index]->empty())
+	if (map[set_iterator->index]->empty())
 	{
-		map[req_iterator->index] = nullptr;
-		req_iterator->goToNext();
+		map[set_iterator->index] = nullptr;
+		set_iterator->goToNext();
 	}
 }
 
