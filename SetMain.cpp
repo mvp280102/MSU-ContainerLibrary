@@ -1,22 +1,51 @@
+#include "SetTest.h"
 #include "Set.h"
 #include "Mem.h"
 
 #include <ctime>
-
 
 int main()
 {
 	Mem mm(0);
 	Set set(mm);
 
-	unsigned int start = clock();
+	SetTest set_test(&set);
 
-	for (int i = 0; i < CONTAINER_SIZE; i++)
-		set.insert(&i, sizeof(i));
+	unsigned int start, first, second;
 
-	unsigned int end = clock();
+	start = clock();
 
-	cout << "Time: " << end - start << endl;
+	cout << "Test for insert() and find():" << endl;
+
+	if (!set_test.insert_find_test())
+		cout << "Test passed!" << endl;
+	else
+	{
+		cout << "Something's wrong!" << endl
+			 << "Aborting program!" << endl;
+
+		exit(1);
+	}
+
+	first = clock() - start;
+
+	cout << "Time: " << first / CLOCKS_PER_SEC << " s." << endl << endl;
+
+	cout << "Test for remove() and find():" << endl;
+
+	if (!set_test.remove_find_test())
+		cout << "Test passed!" << endl;
+	else
+	{
+		cout << "Something's wrong!" << endl
+		     << "Aborting program!" << endl;
+
+		exit(1);
+	}
+
+	second = clock() - first;
+
+	cout << "Time: " << second / CLOCKS_PER_SEC << " s." << endl << endl;
 
 	return 0;
 }

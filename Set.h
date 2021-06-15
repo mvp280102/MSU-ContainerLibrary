@@ -17,11 +17,14 @@ class Set : public AbstractSet
 	// Класс итератора множества.
 	class SetIterator : public Container::Iterator
 	{
-		public:
+		private:
 
 		Set *set;
 		List::Iterator *cur;
 		int index;
+
+
+		public:
 
 		SetIterator(Set *set, List::Iterator *cur, int index)
 		{
@@ -43,8 +46,10 @@ class Set : public AbstractSet
 		// Возвращает true, если текущий итератор равен заданному, иначе false.
 		bool equals(Iterator *right) override;
 
+		// Деструктор.
 		~SetIterator() = default;
 
+		// Дружественный класс Set.
 		friend Set;
 	};
 

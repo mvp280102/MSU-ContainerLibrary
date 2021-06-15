@@ -30,6 +30,7 @@ void Set::SetIterator::goToNext()
 	if (cur->hasNext())
 		cur->goToNext();
 	else
+	{
 		for (int i = index + 1; i < CONTAINER_SIZE; ++i)
 			if (set->map[i] != nullptr)
 			{
@@ -38,8 +39,9 @@ void Set::SetIterator::goToNext()
 				break;
 			}
 
-	if (!success)
-		throw Error("Next element doesn't exist.");
+		if (!success)
+			cout << "Next element doesn't exist." << endl;
+	}
 }
 
 // Возвращает true, если текущий итератор равен заданному, иначе false.
@@ -83,7 +85,11 @@ Set::Iterator* Set::find(void *elem, size_t size)
 {
 	SetIterator *set_iter = nullptr;
 	size_t index = hash_function(elem, size);
-	List::ListIterator *list_iter = dynamic_cast<List::ListIterator *>(map[index]->find(elem, size));
+
+	if (map[index] == nullptr)
+		return nullptr;
+
+	auto *list_iter = dynamic_cast<List::ListIterator *>(map[index]->find(elem, size));
 
 	if (list_iter != nullptr)
 		set_iter = new SetIterator(this, list_iter, index);
@@ -94,32 +100,35 @@ Set::Iterator* Set::find(void *elem, size_t size)
 // Создает итератор, соответствующий данному типу контейнера.
 Set::Iterator* Set::newIterator()
 {
-	SetIterator *iter = new SetIterator(this, nullptr, 0);
+	for (int i = 0; i < CONTAINER_SIZE; ++i)
+		if (map[i] != nullptr)
+			return new SetIterator(this, dynamic_cast<List::ListIterator*>(map[i]->newIterator()), i);
 
-	return iter;
+	return nullptr;
 }
 
 // Удаляет элемент из позиции, на которую указывает итератор iter.
 // После удаления итератор указывает на следующий за удаленным элемент.
 void Set::remove(Iterator *iter)
 {
-	SetIterator *req_iterator = dynamic_cast<SetIterator*>(iter);
+	auto *req_iterator = dynamic_cast<SetIterator*>(iter);
 
 	map[req_iterator->index]->remove(req_iterator->cur);
 
-	// Если список не пуст, перейти к следующему элементу в списке.
-	// Если список пуст, перейти к следюущему списку.
-
-	// getElement() - если nullptr, то сдвигать.
+	if (map[req_iterator->index]->empty())
+	{
+		map[req_iterator->index] = nullptr;
+		req_iterator->goToNext();
+	}
 }
 
 // Удаляет все элементы из контейнера.
 void Set::clear()
 {
-	for (int i = 0; i < CONTAINER_SIZE; ++i)
+	for (auto & i : map)
 	{
-		_memory.freeMem(map[i]);
-		map[i] = nullptr;
+		_memory.freeMem(i);
+		i = nullptr;
 	}
 
 	elements_count = 0;
