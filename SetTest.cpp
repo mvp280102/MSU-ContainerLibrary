@@ -5,11 +5,11 @@
 // и проверяет их фактическое наличие с помощью find().
 // В случае успеха возвращает 0, в случае неудачи - 1.
 // В случае неудачи выводит номер элемента, вызвашего ошибку.
-int SetTest::insert_find_test()
+int SetTest::insert_find_test(int count)
 {
 	Set::SetIterator *set_iterator;
 
-	for (int i = 0; i < CONTAINER_SIZE; i++)
+	for (int i = 0; i < count; i++)
 	{
 		set->insert(&i, sizeof(i));
 
@@ -30,11 +30,11 @@ int SetTest::insert_find_test()
 // и проверяет наличие четных и отсутствие нечетных с помощью find().
 // В случае успеха возвращает 0, в случае неудачи - 1.
 // В случае неудачи выводит номер элемента, вызвашего ошибку.
-int SetTest::remove_find_test()
+int SetTest::remove_find_test(int count)
 {
 	Set::SetIterator *set_iterator;
 
-	for (int i = 0; i < CONTAINER_SIZE; i++)
+	for (int i = 0; i < count; i++)
 	{
 		set_iterator = dynamic_cast<Set::SetIterator*>(set->find(&i, sizeof(i)));
 

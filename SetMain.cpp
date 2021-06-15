@@ -17,7 +17,7 @@ int main()
 
 	cout << "Test for insert() and find():" << endl;
 
-	if (!set_test.insert_find_test())
+	if (!set_test.insert_find_test(1'000'000))
 		cout << "Test passed!" << endl;
 	else
 	{
@@ -29,11 +29,11 @@ int main()
 
 	first = clock() - start;
 
-	cout << "Time: " << first / CLOCKS_PER_SEC << " s." << endl << endl;
+	cout << "Time: " << (double)first / CLOCKS_PER_SEC << " s." << endl << endl;
 
 	cout << "Test for remove() and find():" << endl;
 
-	if (!set_test.remove_find_test())
+	if (!set_test.remove_find_test(1'000'000))
 		cout << "Test passed!" << endl;
 	else
 	{
@@ -45,7 +45,7 @@ int main()
 
 	second = clock() - first;
 
-	cout << "Time: " << second / CLOCKS_PER_SEC << " s." << endl << endl;
+	cout << "Time: " << (double)second / CLOCKS_PER_SEC << " s." << endl << endl;
 
 	return 0;
 }
