@@ -14,19 +14,12 @@ void* List::ListIterator::getElement(size_t &size)
 // Возвращает true, если есть следующий элемент, иначе false.
 bool List::ListIterator::hasNext()
 {
-	return current->next != nullptr;
+	return (current != nullptr) && (current->next != nullptr);
 }
 
 // Переходит к следующему элементу.
 void List::ListIterator::goToNext()
 {
-	/*
-	if (hasNext())
-		current = current->next;
-	else
-		current = nullptr;
-	*/
-
 	if (current == nullptr)
 		return;
 
@@ -194,7 +187,7 @@ List::Iterator* List::find(void *elem, size_t size)
 			continue;
 		}
 
-		if (elem == temp->current->value)
+		if (!memcmp(elem, temp->current->value, size))
 			break;
 		else
 			temp->goToNext();
@@ -233,10 +226,16 @@ void List::remove(Container::Iterator *iter)
 		trash->current = beginning->next;
 		Cell *previous = beginning;
 
-		while (trash->current != iterator->current && trash->current != nullptr)
+		while (trash->current != iterator->current)
 		{
 			trash->goToNext();
 			previous = previous->next;
+
+			if (trash->current == nullptr)
+			{
+				cout << "Required element not found!";
+				exit(1);
+			}
 		}
 
 		previous->next = iterator->current->next;
