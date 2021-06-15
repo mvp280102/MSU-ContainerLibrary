@@ -8,7 +8,7 @@ class Mem: public MemoryManager
 	public:
 
 	// Конструктор.
-	Mem(size_t sz): MemoryManager(sz) {}
+	explicit Mem(size_t sz): MemoryManager(sz) {}
 
 	// Возвращает указатель на выделенную память заданного размера.
 	void* allocMem(size_t sz) override

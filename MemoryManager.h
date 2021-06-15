@@ -16,7 +16,7 @@ class MemoryManager
 	public:
 
 	// Конструктор.
-	MemoryManager(size_t sz): _size(sz) {}
+	explicit MemoryManager(size_t sz): _size(sz) {}
 
 	size_t size()
 	{
