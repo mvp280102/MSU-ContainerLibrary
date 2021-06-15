@@ -48,7 +48,7 @@ bool Table::TableIterator::equals(Iterator *right) {
 ///////////////* ПЕРСОНАЛЬНЫЕ ФУНКЦИИ КЛАССА TABLE *\\\\\\\\\\\\\\\
 
 int Table::insertByKey(void *key, size_t keySize, void *elem, size_t elemSize){
-	size_t index = hash_function(key, keySize);
+	size_t index = common_hash_function(key, keySize);
 
 	char *keyToSave = static_cast<char*>(_memory.allocMem(sizeof(keySize)));
 	char *elemToSave = static_cast<char*>(_memory.allocMem(sizeof(elemSize)));
@@ -78,7 +78,7 @@ int Table::insertByKey(void *key, size_t keySize, void *elem, size_t elemSize){
 }
 
 void Table::removeByKey(void *key, size_t keySize) {
-	size_t index = hash_function(key, keySize);
+	size_t index = common_hash_function(key, keySize);
 
 	TableList::Iterator *tmp = map[index]->find(key, keySize);
 	if (tmp != nullptr) {
@@ -93,7 +93,7 @@ void Table::removeByKey(void *key, size_t keySize) {
 }
 
 Container::Iterator* Table::findByKey(void *key, size_t keySize){
-	size_t index = hash_function(key, keySize);
+	size_t index = common_hash_function(key, keySize);
 	if(map[index] == nullptr || map[index]->empty())
 		return nullptr;
 	TableList::Iterator* temp = dynamic_cast<TableList::Iterator*>(map[index]->find(key, keySize));
@@ -105,7 +105,7 @@ Container::Iterator* Table::findByKey(void *key, size_t keySize){
 ///// головная боль № 1\\\\\
 
 void* Table::at(void *key, size_t keySize, size_t &valueSize){
-	size_t index = hash_function(key, keySize);
+	size_t index = common_hash_function(key, keySize);
 	ArrayCell temp = {key, keySize, nullptr, 0};
 	void* data = static_cast<void*>(&temp);
 	size_t data_size = sizeof data;

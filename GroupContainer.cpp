@@ -1,7 +1,7 @@
 #include "GroupContainer.h"
 
 // Хэш-функция.
-size_t GroupContainer::hash_function(void *key, size_t keySize)
+size_t GroupContainer::common_hash_function(void *key, size_t keySize)
 {
 	size_t hash = 0;
 	char* temp = static_cast<char*>(key);

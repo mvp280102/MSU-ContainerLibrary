@@ -1,12 +1,12 @@
 #include "List.h"
 #include "Table.h"
 #include "Mem.h"
+
 /*
 int main() {
 
-	Mem mem(10000000);
+	Mem mem(500000);
 	Table table(mem);
-	List list(mem);
 
 	size_t size;
 
@@ -79,5 +79,4 @@ int main() {
 
 	return 0;
 
-}
- */
+}*/

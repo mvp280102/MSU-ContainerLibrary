@@ -14,7 +14,13 @@ class GroupContainer: public Container
 	int elements_count = 0;
 
 	// Хэш-функция.
-	size_t hash_function(void *key, size_t keySize);
+	size_t common_hash_function(void *key, size_t keySize);
+
+
+	public:
+
+	// Конструктор.
+	explicit GroupContainer(MemoryManager &mem): Container(mem) {}
 
 	// Возвращает значение, равное количеству элементов в контейнере.
 	int size() override;
@@ -24,11 +30,4 @@ class GroupContainer: public Container
 
 	// Если контейнер пуст, возвращает true, иначе false.
 	bool empty() override;
-
-	//// Функция перехеширования.
-
-	public:
-
-	// Конструктор.
-	explicit GroupContainer(MemoryManager &mem): Container(mem) {}
 };
