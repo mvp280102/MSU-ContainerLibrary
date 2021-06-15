@@ -2,12 +2,25 @@
 
 #include "Set.h"
 
+#include <vector>
+#include <algorithm>
+
+// Структура элемента множества.
+struct Cell
+{
+	void *data;
+	size_t size;
+};
+
 // Тестирующий класс для контейнера Set - Множество.
 class SetTest
 {
 	private:
 
 	Set *set;
+
+	// Функция сравнения для сортировки.
+	static bool comp(Cell first, Cell second);
 
 
 	public:
