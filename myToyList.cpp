@@ -3,25 +3,26 @@
 /////////////// * Функции итератора * \\\\\\\\\\\\\\\
 
 void* List::Iterator::getElement(size_t &size) {
+    if (current == nullptr) {
+        size = 0;
+        return nullptr;
+    }
     size = current->value_size;
     return current->value;
 }
 
 bool List::Iterator::hasNext() {
-    if(current->next != nullptr)
-        return true;
-    return false;
+    if(current == nullptr || current->next == nullptr)
+        return false;
+
+    return true;
 }
 
 void List::Iterator::goToNext() {
-    if (current == nullptr) {
-        return;
+    if (current != nullptr &&  current->next != nullptr) {
+        current = current->next;
     }
-    current = current->next;
 }
-//    else
-//        throw Error("There is no next one");
-
 
 bool List::Iterator::equals(Container::Iterator *right) {
     if (current == dynamic_cast<Iterator*>(right)->current)
@@ -135,10 +136,14 @@ List::Iterator* List::newIterator() {
 
 void List::remove(Container::Iterator *iter) {
     Iterator* iterator = dynamic_cast<Iterator *>(iter);
-    if (iterator->current == beginning) {
+    if (iterator == nullptr || iterator->current == nullptr)
+        return;
+    Iterator *trash = newIterator();
+
+    if (iterator->equals(trash)) {
         pop_front();
+        iterator->current = beginning;
     } else {
-        Iterator *trash = newIterator();
         trash->current = beginning->next;
         Cell *previous = beginning;
         while (trash->current != iterator->current && trash->current != nullptr) {
@@ -146,6 +151,11 @@ void List::remove(Container::Iterator *iter) {
             previous = previous->next;
         }
         previous->next = iterator->current->next;
+        if(iterator->hasNext())
+            iterator->goToNext();
+        else{
+            iterator->current = nullptr;
+        }
         _memory.freeMem(trash->current->value);
         _memory.freeMem(trash->current);
         cells_count--;
@@ -160,6 +170,8 @@ void List::clear() {
         _memory.freeMem(trash);
         trash = beginning;
     }
+    cells_count = 0;
+    beginning = nullptr;
 }
 
 bool List::empty() {

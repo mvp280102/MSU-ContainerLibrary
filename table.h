@@ -7,13 +7,16 @@
 
 class Table : public AbstractTable {
 private:
-    static const size_t container_size = 500'000;
-    ListForTable *map[container_size] = {nullptr};
-    size_t elements_count = 0;
+    ListForTable **map;
 
 public:
 
-    Table(MemoryManager &mem): AbstractTable(mem)  {}
+    Table(MemoryManager &mem): AbstractTable(mem)  {
+            map = new (mem.allocMem(CONTAINER_SIZE * sizeof(ListForTable*))) ListForTable*[CONTAINER_SIZE];
+            for (int i = 0; i < CONTAINER_SIZE; i++) {
+                map[i] = nullptr;
+            }
+    }
 
     class TableIterator : public Container::Iterator  {
     public:
@@ -59,12 +62,6 @@ public:
     // хэш функция
     size_t hash_function(void *key, size_t keySize) override;
 
-    // Возвращает значение, равное количеству элементов в контейнере.
-    int size() override;
-
-    // Возвращает значение, равное максимальной вместимости контейнера в байтах.
-    size_t max_bytes() override;
-
     // Возвращает указатель на итератор, указывающий на первый найденный в контейнере элемент.
     // Если элемент не найден, возвращает пустой указатель.
     Iterator *find(void *elem, size_t size) override;
@@ -78,9 +75,6 @@ public:
 
     // Удаляет все элементы из контейнера.
     void clear() override;
-
-    // Если контейнер пуст возвращает true, иначе false.
-    bool empty() override;
 
 };
 

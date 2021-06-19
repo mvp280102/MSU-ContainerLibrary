@@ -1,18 +1,25 @@
-#include "table.h"
+#include "Table.h"
 
 ///////////////* ФУНКЦИИ КЛАССА ITERATOR *\\\\\\\\\\\\\\\
 
 void* Table::TableIterator::getElement(size_t &size) {
+    if(current_cell == nullptr)
+        return nullptr;
     ArrayCell* temp = static_cast<ArrayCell*>(current_cell->getElement(size));
+    if(temp == nullptr)
+        return nullptr;
+    size = temp->elem_size;
     return temp->elem;
 }
 
 bool Table::TableIterator::hasNext() {
+    if(current_cell == nullptr)
+        return false;
     if(current_cell->hasNext())
         return true;
     else{
-        for (int i = index + 1; i < container_size; ++i) {
-            if(!table->map[i]->empty())
+        for (int i = index + 1; i < CONTAINER_SIZE; ++i) {
+            if(table->map[i] != nullptr && !table->map[i]->empty())
                 return true;
         }
     }
@@ -20,29 +27,23 @@ bool Table::TableIterator::hasNext() {
 }
 
 void Table::TableIterator::goToNext() {
-    bool flag = false;
     if (current_cell->hasNext())
         current_cell->goToNext();
     else {
-        for (int i = index + 1; i < container_size; ++i) {
-            if (table->map[i] != nullptr) {
+        for (int i = index + 1; i < CONTAINER_SIZE; ++i) {
+            if (table->map[i] != nullptr && !table->map[i]->empty()) {
                 current_cell = table->map[i]->newIterator();
                 index = i;
-                flag = true;
-                break;
+                return;
             }
-        }
-        if (!flag) {
-//            throw Error("There is no next one");
-            current_cell = nullptr;
         }
     }
 }
 
 bool Table::TableIterator::equals(Iterator *right) {
-    if (current_cell == dynamic_cast<TableIterator*>(right)->current_cell)
-        return true;
-    return false;
+    if (current_cell == nullptr || right == nullptr)
+        return false;
+    return current_cell->equals((dynamic_cast<TableIterator*>(right))->current_cell);
 }
 
 ///////////////* ПЕРСОНАЛЬНЫЕ ФУНКЦИИ КЛАССА TABLE *\\\\\\\\\\\\\\\
@@ -50,8 +51,8 @@ bool Table::TableIterator::equals(Iterator *right) {
 int Table::insertByKey(void *key, size_t keySize, void *elem, size_t elemSize){
     size_t index = hash_function(key, keySize);
 
-    char *keyToSave = static_cast<char*>(_memory.allocMem(sizeof(keySize)));
-    char *elemToSave = static_cast<char*>(_memory.allocMem(sizeof(elemSize)));
+    char *keyToSave = static_cast<char*>(_memory.allocMem(keySize));
+    char *elemToSave = static_cast<char*>(_memory.allocMem(elemSize));
     memcpy(keyToSave, key, keySize);
     memcpy(elemToSave, elem, elemSize);
 
@@ -59,7 +60,7 @@ int Table::insertByKey(void *key, size_t keySize, void *elem, size_t elemSize){
     void* data = static_cast<void*>(&temp);
     size_t data_size = sizeof(temp);
     if(map[index] == nullptr) {
-        map[index] = new ListForTable(_memory);
+        map[index] = new (_memory.allocMem(sizeof (ListForTable))) ListForTable(_memory);
     }
 
     if(map[index]->empty()) {
@@ -74,21 +75,24 @@ int Table::insertByKey(void *key, size_t keySize, void *elem, size_t elemSize){
             return 0;
         }
     }
+
     return 1;
 }
 
 void Table::removeByKey(void *key, size_t keySize) {
     size_t index = hash_function(key, keySize);
 
-    ListForTable::Iterator *tmp = map[index]->find(key, keySize);
-    if (tmp != nullptr) {
-        map[index]->remove(tmp);
-        elements_count--;
-    }
+    if(map[index] != nullptr) {
+        ListForTable::Iterator *tmp = map[index]->find(key, keySize);
+        if (tmp != nullptr) {
+            map[index]->remove(tmp);
+            elements_count--;
+        }
 
-    if (map[index]->empty()){
-        _memory.freeMem(map[index]);
-        map[index] = nullptr;
+        if (map[index]->empty()) {
+            _memory.freeMem(map[index]);
+            map[index] = nullptr;
+        }
     }
 }
 
@@ -113,24 +117,11 @@ void* Table::at(void *key, size_t keySize, size_t &valueSize){
     return findedCell->elem;
 }
 
-
-size_t Table::hash_function(void *key, size_t keySize){
-    size_t hash = 0;
-    char* why_not = static_cast<char*>(key);
-    for(int i = 0; i < keySize; ++i)
-        hash = 31 * hash + why_not[i];
-    return hash % container_size;
+size_t Table::hash_function(void *key, size_t keySize) {
+    return common_hash_function(key, keySize);
 }
 
 ///////////////* ФУНКЦИИ КЛАССА TABLE *\\\\\\\\\\\\\\\
-
-int Table::size() {
-    return elements_count;
-}
-
-size_t Table::max_bytes() {
-    return _memory.maxBytes();
-}
 
 Container::Iterator* Table::find(void *elem, size_t size) {
     TableIterator* finder = dynamic_cast<TableIterator *>(newIterator());
@@ -146,7 +137,7 @@ Container::Iterator* Table::find(void *elem, size_t size) {
 }
 
 Table::Iterator* Table::newIterator() {
-    for (int i = 0; i < container_size; ++i) {
+    for (int i = 0; i < CONTAINER_SIZE; ++i) {
         if(map[i] != nullptr)
             return new TableIterator(dynamic_cast<ListForTable::Iterator*>(map[i]->newIterator()), i, this);
     }
@@ -154,29 +145,39 @@ Table::Iterator* Table::newIterator() {
 }
 
 void Table::remove(Iterator *iter){
-    TableIterator* Iter = dynamic_cast<TableIterator *>(iter);
-    if(Iter != nullptr && Iter->current_cell != nullptr) {
-        map[Iter->index]->remove(Iter->current_cell);
-        elements_count--;
-    }
 
-    if (map[Iter->index]->empty()){
-        _memory.freeMem(map[Iter->index]);
-        map[Iter->index] = nullptr;
+    TableIterator* Iter = dynamic_cast<TableIterator *>(iter);
+    if(Iter == nullptr || Iter->current_cell == nullptr)
+        return;
+
+    if(map[Iter->index] != nullptr || !map[Iter->index]->empty())
+    map[Iter->index]->remove(Iter->current_cell);
+    elements_count--;
+
+
+    size_t trash;
+
+    if (Iter->getElement(trash) == nullptr) {
+        if (map[Iter->index]->empty()) {
+            _memory.freeMem(map[Iter->index]);
+            map[Iter->index] = nullptr;
+        }
+        if(Iter->hasNext())
+            Iter->goToNext();
+        else{
+            delete Iter->current_cell;
+            Iter->current_cell = nullptr;
+            Iter->index = -1;
+        }
     }
 }
 
 void Table::clear() {
-    for (int i = 0; i < container_size; ++i) {
+    for (int i = 0; i < CONTAINER_SIZE; ++i) {
         _memory.freeMem(map[i]);
         map[i] = nullptr;
     }
     elements_count = 0;
 }
 
-bool Table::empty() {
-    if(size() == 0)
-        return true;
-    return false;
-}
 

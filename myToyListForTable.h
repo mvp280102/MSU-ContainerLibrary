@@ -18,11 +18,14 @@ public:
         size_t trash;
         do {
             ArrayCell temp = *(ArrayCell*)(iter->getElement(trash));
-            //cout << "Test:" << *(int*)elem << " "<< *(int*)temp.key << endl;
-            if(temp.key_size == size)
-                if(memcmp(temp.key, elem, size) == 0)
+            if(temp.key_size == size) {
+                if (memcmp(temp.key, elem, size) == 0)
                     break;
+            }
+            if (iter->hasNext())
                 iter->goToNext();
+            else
+                return nullptr;
         } while (iter->current != nullptr);
         if(iter->current == nullptr)
             return nullptr;
